@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le compteur des franchises et de la participation forfaitaire</title>
+<style>
+:root{--prune:#8C1E70;--pruneD:#5E1349;--pruneC:#F4E6EE;--gris:#3C3C3C;--grisM:#8A7A85;
+ --filet:#E8DCE5;--fond:#FAF6F8;--vert:#1B7A4B;--vertC:#EAF5EF;--rouge:#B3261E;--rougeC:#FCEDEC;
+ --or:#C9A961;--orC:#FCF4DC}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fond);color:var(--gris);line-height:1.5;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px 48px}
+header{background:var(--pruneD);color:#fff;padding:22px 16px 20px}
+header .in{max-width:960px;margin:0 auto}
+.marque{font-size:11px;letter-spacing:.12em;color:#E8C9DF;font-weight:700;margin-bottom:6px}
+h1{margin:0 0 6px;font-size:24px}
+header p{margin:0;color:#EBD6E4;font-size:14px}
+.card{background:#fff;border:1px solid var(--filet);border-radius:10px;padding:20px;margin-top:20px}
+.card h2{margin:0 0 4px;font-size:17px;color:var(--pruneD)}
+.card .sub{margin:0 0 16px;color:var(--grisM);font-size:13.5px}
+.badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:6px 12px;
+ border-radius:20px;font-weight:600;margin-bottom:14px}
+.badge.live{background:var(--vertC);color:var(--vert)}
+.badge.wait{background:var(--pruneC);color:var(--prune)}
+.badge.fall{background:var(--orC);color:#8a6d1f}
+.badge .pt{width:8px;height:8px;border-radius:50%;background:currentColor}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px}
+.pp{border:1px solid var(--filet);border-radius:8px;padding:10px 12px;background:var(--fond)}
+.pp label{display:block;font-size:11.5px;color:var(--grisM);margin-bottom:6px;line-height:1.3;min-height:32px}
+.pp .row{display:flex;align-items:center;gap:8px}
+.pp input[type=range]{flex:1;accent-color:var(--prune)}
+.pp .v{font-size:17px;font-weight:700;color:var(--pruneD);min-width:26px;text-align:right}
+.pp .src{font-size:10px;color:var(--grisM);margin-top:5px;font-style:italic}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.cols{grid-template-columns:1fr}}
+.col{border:1px solid var(--filet);border-radius:9px;overflow:hidden}
+.col .tt{padding:11px 14px;font-weight:700;font-size:14.5px;color:#fff;background:var(--prune)}
+.col.f .tt{background:#7A5AA8}
+table.det{width:100%;border-collapse:collapse;font-size:13px}
+table.det td{padding:7px 12px;border-bottom:1px solid var(--filet)}
+table.det td:last-child{text-align:right;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.det tr.tot td{background:var(--pruneC);color:var(--pruneD);font-weight:700;border-bottom:0}
+table.det tr.plaf td{background:var(--orC);color:#8a6d1f}
+table.det tr.nul td{color:var(--grisM)}
+table.det tr.sub td{font-size:11.8px;color:var(--grisM);font-style:italic;padding-top:0;padding-bottom:7px}
+table.det tr.sub td:last-child{font-weight:400}
+.tot2{margin-top:16px;background:var(--pruneD);color:#fff;border-radius:9px;padding:16px 18px;text-align:center}
+.tot2 .n{font-size:29px;font-weight:700}
+.tot2 p{margin:4px 0 0;font-size:13.5px;color:#EBD6E4}
+.jauge{margin-top:12px}
+.jauge .h{display:flex;justify-content:space-between;font-size:12.5px;color:var(--grisM);margin-bottom:5px}
+.jauge .h b{color:var(--pruneD)}
+.piste{height:15px;background:var(--fond);border:1px solid var(--filet);border-radius:8px;overflow:hidden}
+.piste i{display:block;height:100%;background:var(--prune);transition:width .25s}
+.piste i.plein{background:var(--or)}
+.note{background:var(--pruneC);border-left:4px solid var(--prune);padding:12px 14px;
+ border-radius:0 6px 6px 0;font-size:13.5px;margin-top:14px}
+.note.or{background:var(--orC);border-left-color:var(--or)}
+.note b{color:var(--pruneD)}
+ul.ret{margin:0;padding-left:18px;font-size:14px}
+ul.ret li{margin-bottom:7px}
+footer{text-align:center;color:var(--grisM);font-size:11px;padding:24px 16px 30px}
+</style></head><body>
+
+<header><div class="in">
+<div class="marque">TMK PERFORMANCES</div>
+<h1>Le compteur des franchises et de la participation forfaitaire</h1>
+<p>Séquence 3 — Les fondamentaux de la santé · Outil d'exploration</p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card">
+  <h2>Composez une journée de soins</h2>
+  <p class="sub">Faites varier les curseurs&nbsp;: le détail des retenues se recalcule, et les plafonds se déclenchent tout seuls.</p>
+  <div class="grid" id="curseurs"></div>
+</div>
+
+<div class="card">
+  <h2>Ce qui est retenu sur cette journée</h2>
+  <p class="sub">À gauche les actes des médecins, à droite les médicaments, les auxiliaires médicaux et les transports.</p>
+  <div class="cols">
+    <div class="col"><div class="tt">Participation forfaitaire</div><table class="det" id="tPF"></table></div>
+    <div class="col f"><div class="tt">Franchise médicale</div><table class="det" id="tFR"></table></div>
+  </div>
+  <div class="tot2"><div class="n" id="totJ">—</div><p>retenus au titre de cette seule journée</p></div>
+  <div class="note" id="noteJ"></div>
+</div>
+
+<div class="card">
+  <h2>Et sur l'année&nbsp;?</h2>
+  <p class="sub">Imaginons que cette journée se répète. Les deux plafonds annuels sont distincts&nbsp;: chacun se remplit de son côté.</p>
+  <div class="pp" style="max-width:420px;margin-bottom:16px">
+    <label>Nombre de journées de ce type dans l'année</label>
+    <div class="row"><input type="range" id="njours" min="1" max="60" value="6"><span class="v" id="vjours">6</span></div>
+  </div>
+  <div class="jauge">
+    <div class="h"><span>Participation forfaitaire — plafond annuel</span><b id="jpfT">—</b></div>
+    <div class="piste"><i id="jpf" style="width:0%"></i></div>
+  </div>
+  <div class="jauge">
+    <div class="h"><span>Franchise médicale — plafond annuel</span><b id="jfrT">—</b></div>
+    <div class="piste"><i id="jfr" style="width:0%"></i></div>
+  </div>
+  <div class="note or" id="noteA"></div>
+</div>
+
+<div class="card">
+  <h2>Ce qu'il faut retenir</h2>
+  <ul class="ret">
+    <li>La distinction se fait sur la <b>nature de l'acte</b>&nbsp;: le médecin et la biologie d'un côté, les médicaments, les auxiliaires médicaux et les transports de l'autre.</li>
+    <li>Chaque catégorie a son propre montant et son propre plafond journalier — sauf les <b>médicaments</b>, qui n'en ont aucun&nbsp;: une ordonnance très chargée se paie en une seule fois.</li>
+    <li>Le plafond journalier de la participation forfaitaire s'apprécie <b>par professionnel</b>&nbsp;: consulter deux praticiens dans la même journée ouvre deux compteurs.</li>
+    <li>Les <b>deux plafonds annuels sont distincts</b>. Un même assuré peut supporter les deux dans la même année.</li>
+    <li>Rien de tout cela n'est payé au guichet&nbsp;: ces sommes sont déduites des remboursements versés ensuite, d'où le décalage que le client constate sur son décompte.</li>
+    <li>Un contrat responsable n'a pas le droit de rembourser ces sommes&nbsp;: elles sont irréductibles.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Les valeurs de référence</h2>
+  <p class="sub">Lues dans la base de paramètres, et modifiables ici pour tester une hypothèse.</p>
+  <div class="badge wait" id="badge"><span class="pt"></span><span id="badgeT">Lecture de la base…</span></div>
+  <div class="grid" id="params"></div>
+</div>
+
+<footer>TMK Performances - N° Siret&nbsp;: 49841924100027 - Code NAF&nbsp;: 8559A</footer>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ibkvyjlglwufxvzxnysa.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xUfZHSOHf4TnBRRyzU_qJA_TcXIMSKX";
+const TABLE = "parametres_sante";
+
+const P = [
+ {id:"pf",      cle:"sante_participation_forfaitaire",          lab:"Participation forfaitaire, par acte (€)",             def:2},
+ {id:"pfJ",     cle:"sante_pf_plafond_jour",                    lab:"Plafond journalier, par professionnel (€)",           def:8},
+ {id:"pfAn",    cle:"sante_pf_plafond_annuel",                  lab:"Plafond annuel de participation forfaitaire (€)",     def:50},
+ {id:"fMed",    cle:"sante_franchise_medicament",               lab:"Franchise par boîte de médicament (€)",               def:1},
+ {id:"fPara",   cle:"sante_franchise_acte_paramedical",         lab:"Franchise par acte d'auxiliaire médical (€)",         def:1},
+ {id:"fTrans",  cle:"sante_franchise_transport",                lab:"Franchise par transport sanitaire (€)",               def:4},
+ {id:"fParaJ",  cle:"sante_franchise_plafond_jour_paramedical", lab:"Plafond journalier, actes paramédicaux (€)",          def:4},
+ {id:"fTransJ", cle:"sante_franchise_plafond_jour_transport",   lab:"Plafond journalier, transports (€)",                  def:8},
+ {id:"fAn",     cle:"sante_franchise_plafond_annuel",           lab:"Plafond annuel des franchises (€)",                   def:50},
+];
+
+const C = [
+ {id:"nMed",   lab:"Actes réalisés par un <b>même médecin</b> dans la journée", max:6, val:1},
+ {id:"nBio",   lab:"Analyses de biologie médicale (autre professionnel)",       max:4, val:1},
+ {id:"nBoite", lab:"Boîtes de médicaments délivrées",                           max:12, val:3},
+ {id:"nPara",  lab:"Actes d'auxiliaires médicaux (infirmier, kiné…)",           max:8, val:2},
+ {id:"nTrans", lab:"Transports sanitaires",                                     max:4, val:0},
+];
+
+const eur = v => v.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €";
+const val = id => parseFloat(document.getElementById("p_"+id).value) || 0;
+const cur = id => parseInt(document.getElementById("c_"+id).value, 10) || 0;
+
+function champs(){
+  document.getElementById("curseurs").innerHTML = C.map(c =>
+    '<div class="pp"><label>' + c.lab + '</label><div class="row">'
+    + '<input type="range" id="c_' + c.id + '" min="0" max="' + c.max + '" value="' + c.val + '">'
+    + '<span class="v" id="v_' + c.id + '">' + c.val + '</span></div></div>').join("");
+  C.forEach(c => document.getElementById("c_"+c.id).addEventListener("input", () => {
+    document.getElementById("v_"+c.id).textContent = cur(c.id); calcul(); }));
+
+  document.getElementById("params").innerHTML = P.map(p =>
+    '<div class="pp"><label>' + p.lab + '</label>'
+    + '<input type="number" step="0.01" id="p_' + p.id + '" value="' + p.def
+    + '" style="width:100%;border:1px solid var(--filet);border-radius:6px;padding:7px 9px;'
+    + 'font-size:15px;font-weight:700;color:var(--pruneD);font-family:inherit;background:#fff">'
+    + '<div class="src" id="s_' + p.id + '">valeur de repli · ' + p.cle + '</div></div>').join("");
+  P.forEach(p => document.getElementById("p_"+p.id).addEventListener("input", calcul));
+
+  document.getElementById("njours").addEventListener("input", () => {
+    document.getElementById("vjours").textContent = document.getElementById("njours").value; calcul(); });
+}
+
+async function lireBase(){
+  const url = SUPABASE_URL + "/rest/v1/" + TABLE + "?select=cle,valeur,date_effet";
+  const cle = new URLSearchParams(location.search).get("key") || SUPABASE_KEY;
+  let data = null;
+  try{
+    let r = await fetch(url + "&apikey=" + encodeURIComponent(cle));
+    if(!r.ok) r = await fetch(url, {headers:{apikey:cle, Authorization:"Bearer " + cle}});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    data = await r.json();
+  }catch(e){ return etat("fall","Base injoignable — valeurs de repli affichées"); }
+  if(!Array.isArray(data) || !data.length)
+    return etat("fall","Base joignable mais aucune ligne lue — vérifier la politique de lecture publique");
+  const B = {}; data.forEach(r => B[r.cle] = r);
+  let n = 0;
+  P.forEach(p => {
+    const l = B[p.cle], s = document.getElementById("s_"+p.id);
+    if(l && l.valeur !== null){
+      document.getElementById("p_"+p.id).value = parseFloat(l.valeur);
+      s.className = "src";
+      s.textContent = "base · " + p.cle + (l.date_effet ? " · effet " + l.date_effet : "");
+      n++;
+    }else{ s.className = "src"; s.textContent = "clé absente — valeur de repli · " + p.cle; }
+  });
+  calcul();
+  etat(n === P.length ? "live" : "fall",
+       n === P.length ? "Valeurs lues dans la base — " + data.length + " paramètres santé disponibles"
+                      : n + " valeur(s) sur " + P.length + " lues dans la base");
+}
+function etat(cl, txt){
+  document.getElementById("badge").className = "badge " + cl;
+  document.getElementById("badgeT").textContent = txt;
+}
+
+function ligne(lab, brut, retenu, plafond){
+  if(retenu <= 0 && brut <= 0)
+    return "<tr class='nul'><td>" + lab + "</td><td>—</td></tr>";
+  let h = "<tr" + (plafond ? " class='plaf'" : "") + "><td>" + lab + "</td><td>" + eur(retenu) + "</td></tr>";
+  if(plafond) h += "<tr class='sub'><td>plafonné : " + eur(brut) + " sans le plafond</td><td></td></tr>";
+  return h;
+}
+
+function calcul(){
+  const pf = val("pf"), pfJ = val("pfJ");
+  const nMed = cur("nMed"), nBio = cur("nBio");
+  // le plafond journalier s'apprécie par professionnel : deux compteurs distincts
+  const bMed = nMed * pf, rMed = Math.min(bMed, pfJ);
+  const bBio = nBio * pf, rBio = Math.min(bBio, pfJ);
+  const totPF = rMed + rBio;
+
+  const bBoite = cur("nBoite") * val("fMed"), rBoite = bBoite;           // aucun plafond journalier
+  const bPara  = cur("nPara")  * val("fPara"),  rPara  = Math.min(bPara,  val("fParaJ"));
+  const bTrans = cur("nTrans") * val("fTrans"), rTrans = Math.min(bTrans, val("fTransJ"));
+  const totFR = rBoite + rPara + rTrans;
+
+  document.getElementById("tPF").innerHTML =
+      ligne("Actes du même médecin", bMed, rMed, bMed > pfJ)
+    + ligne("Analyses de biologie médicale", bBio, rBio, bBio > pfJ)
+    + "<tr class='tot'><td>Total de la journée</td><td>" + eur(totPF) + "</td></tr>";
+
+  document.getElementById("tFR").innerHTML =
+      ligne("Boîtes de médicaments", bBoite, rBoite, false)
+    + ligne("Actes d'auxiliaires médicaux", bPara, rPara, bPara > val("fParaJ"))
+    + ligne("Transports sanitaires", bTrans, rTrans, bTrans > val("fTransJ"))
+    + "<tr class='tot'><td>Total de la journée</td><td>" + eur(totFR) + "</td></tr>";
+
+  document.getElementById("totJ").textContent = eur(totPF + totFR);
+
+  let n = [];
+  if(bMed > pfJ) n.push("le plafond journalier de la participation forfaitaire chez le médecin");
+  if(bPara > val("fParaJ")) n.push("le plafond journalier des actes paramédicaux");
+  if(bTrans > val("fTransJ")) n.push("le plafond journalier des transports");
+  document.getElementById("noteJ").innerHTML = n.length
+    ? "<b>Un plafond joue sur cette journée&nbsp;:</b> " + n.join(", ")
+      + ". Les lignes concernées sont surlignées, avec le montant qui aurait été retenu sans plafond."
+    : (bBoite > 0
+       ? "<b>Aucun plafond journalier ne joue ici.</b> Notez que la ligne des médicaments n'en a de toute façon "
+         + "aucun&nbsp;: augmentez le nombre de boîtes et le montant continue de croître, sans limite journalière."
+       : "<b>Aucun plafond journalier ne joue ici.</b> Faites monter les curseurs pour voir chacun se déclencher.");
+
+  const j = parseInt(document.getElementById("njours").value, 10);
+  const cPF = Math.min(totPF * j, val("pfAn")), cFR = Math.min(totFR * j, val("fAn"));
+  const rPF = val("pfAn") ? cPF / val("pfAn") : 0, rFR = val("fAn") ? cFR / val("fAn") : 0;
+  document.getElementById("jpf").style.width = Math.round(rPF * 100) + "%";
+  document.getElementById("jfr").style.width = Math.round(rFR * 100) + "%";
+  document.getElementById("jpf").className = rPF >= 1 ? "plein" : "";
+  document.getElementById("jfr").className = rFR >= 1 ? "plein" : "";
+  document.getElementById("jpfT").textContent = eur(cPF) + " / " + eur(val("pfAn"));
+  document.getElementById("jfrT").textContent = eur(cFR) + " / " + eur(val("fAn"));
+
+  const jPF = totPF > 0 ? Math.ceil(val("pfAn") / totPF) : null;
+  const jFR = totFR > 0 ? Math.ceil(val("fAn") / totFR) : null;
+  let t = "<b>Deux plafonds, deux compteurs.</b> ";
+  if(jPF) t += "À ce rythme, le plafond de participation forfaitaire est atteint à la " + jPF + "<sup>e</sup> journée. ";
+  if(jFR) t += "Celui des franchises l'est à la " + jFR + "<sup>e</sup>. ";
+  t += "Un patient très consommateur de soins les atteint souvent au cours des premiers mois, et ne supporte "
+     + "plus rien jusqu'au 1<sup>er</sup> janvier suivant&nbsp;: c'est un argument à connaître face à un client "
+     + "qui a le sentiment de payer sans fin. Cumulés, les deux plafonds portent le maximum annuel à "
+     + eur(val("pfAn") + val("fAn")) + ".";
+  document.getElementById("noteA").innerHTML = t;
+}
+
+champs();
+calcul();
+lireBase();
+</script>
+</body></html>
